@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memories in Pixel - File Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .gallery-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .file-name {
+            color: #333;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .file-count {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stats p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Memories in Pixel</h1>
+        
+        <div class="stats">
+            <p><strong>Total Files: 37</strong></p>
+        </div>
+
+        <!-- Kathakali Section -->
+        <div class="gallery-section">
+            <h2 class="section-title">🎭 Kathakali</h2>
+            <div class="file-list">
+                <div class="file-item">
+                    <div class="file-name">Kathakali_01.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_02.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_03.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_04.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_05.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_06.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_07.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_08.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_09.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_10.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_11.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_12.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Kathakali_13.jpg</div>
+                </div>
+            </div>
+            <div class="file-count">13 files</div>
+        </div>
+
+        <!-- Kochi Section -->
+        <div class="gallery-section">
+            <h2 class="section-title">🏙️ Kochi</h2>
+            <div class="file-list">
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_1.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_2.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_3.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_4.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_5.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_6.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">Aspeenwall_7.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W1.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W2.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W3.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W4.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W5.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W6.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W7.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">KochiB&W8.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_1.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_2.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_3.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_4.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_5.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_6.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_7.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_8.JPG</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-name">StreetofKochi_9.JPG</div>
+                </div>
+            </div>
+            <div class="file-count">24 files</div>
+        </div>
+    </div>
+</body>
+</html>
