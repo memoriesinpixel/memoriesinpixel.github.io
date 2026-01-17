@@ -31,6 +31,35 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: none;
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        .back-btn.show {
+            display: block;
+        }
+
         .gallery-section {
             background: white;
             border-radius: 12px;
@@ -47,30 +76,74 @@
             border-bottom: 3px solid #667eea;
         }
 
-        .file-list {
+        .collection-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
+            gap: 20px;
         }
 
-        .file-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+        .collection-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .collection-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .collection-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .collection-card p {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        .image-gallery {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .image-gallery.show {
+            display: grid;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
-        .file-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
-        .file-name {
+        .image-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-name {
+            padding: 15px;
+            background: white;
             color: #333;
             font-weight: 500;
+            text-align: center;
             word-break: break-word;
         }
 
@@ -78,10 +151,10 @@
             display: inline-block;
             background: #667eea;
             color: white;
-            padding: 5px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.9em;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .stats {
@@ -97,142 +170,259 @@
             margin: 5px 0;
             font-size: 1.1em;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-50%);
+        }
+
+        .modal-prev, .modal-next {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-prev:hover, .modal-next:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .modal-info {
+            color: white;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        .collections-view {
+            display: block;
+        }
+
+        .collections-view.hide {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎬 Memories in Pixel</h1>
+        <div class="header">
+            <h1>🎬 Memories in Pixel</h1>
+            <button class="back-btn" id="backBtn">← Back</button>
+        </div>
         
         <div class="stats">
-            <p><strong>Total Files: 37</strong></p>
+            <p id="statsText"><strong>Total Files: 37</strong></p>
         </div>
 
-        <!-- Kathakali Section -->
-        <div class="gallery-section">
-            <h2 class="section-title">🎭 Kathakali</h2>
-            <div class="file-list">
-                <div class="file-item">
-                    <div class="file-name">Kathakali_01.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_02.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_03.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_04.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_05.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_06.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_07.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_08.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_09.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_10.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_11.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_12.jpg</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Kathakali_13.jpg</div>
+        <!-- Collections View -->
+        <div class="collections-view" id="collectionsView">
+            <div class="gallery-section">
+                <h2 class="section-title">Collections</h2>
+                <div class="collection-list">
+                    <div class="collection-card" onclick="viewCollection('kathakali', '🎭 Kathakali')">
+                        <h3>🎭 Kathakali</h3>
+                        <p>13 Images</p>
+                    </div>
+                    <div class="collection-card" onclick="viewCollection('kochi', '🏙️ Kochi')">
+                        <h3>🏙️ Kochi</h3>
+                        <p>24 Images</p>
+                    </div>
                 </div>
             </div>
-            <div class="file-count">13 files</div>
         </div>
 
-        <!-- Kochi Section -->
+        <!-- Image Gallery View -->
         <div class="gallery-section">
-            <h2 class="section-title">🏙️ Kochi</h2>
-            <div class="file-list">
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_1.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_2.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_3.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_4.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_5.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_6.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">Aspeenwall_7.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W1.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W2.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W3.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W4.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W5.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W6.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W7.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">KochiB&W8.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_1.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_2.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_3.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_4.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_5.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_6.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_7.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_8.JPG</div>
-                </div>
-                <div class="file-item">
-                    <div class="file-name">StreetofKochi_9.JPG</div>
-                </div>
-            </div>
-            <div class="file-count">24 files</div>
+            <h2 class="section-title" id="galleryTitle" style="display: none;"></h2>
+            <div class="image-gallery" id="imageGallery"></div>
+            <div class="file-count" id="fileCount" style="display: none;"></div>
         </div>
     </div>
+
+    <!-- Image Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <div class="modal-nav">
+                <button class="modal-prev" id="modalPrev">❮</button>
+                <button class="modal-next" id="modalNext">❯</button>
+            </div>
+            <img class="modal-image" id="modalImage" src="" alt="">
+            <div class="modal-info">
+                <span id="modalImageName"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const collections = {
+            kathakali: {
+                title: '🎭 Kathakali',
+                folder: 'images/_kathakali',
+                files: [
+                    'Kathakali_01.jpg', 'Kathakali_02.jpg', 'Kathakali_03.jpg',
+                    'Kathakali_04.jpg', 'Kathakali_05.jpg', 'Kathakali_06.jpg',
+                    'Kathakali_07.jpg', 'Kathakali_08.jpg', 'Kathakali_09.jpg',
+                    'Kathakali_10.jpg', 'Kathakali_11.jpg', 'Kathakali_12.jpg',
+                    'Kathakali_13.jpg'
+                ]
+            },
+            kochi: {
+                title: '🏙️ Kochi',
+                folder: 'images/_kochi',
+                files: [
+                    'Aspeenwall_1.JPG', 'Aspeenwall_2.JPG', 'Aspeenwall_3.JPG',
+                    'Aspeenwall_4.JPG', 'Aspeenwall_5.JPG', 'Aspeenwall_6.JPG',
+                    'Aspeenwall_7.JPG', 'KochiB&W1.JPG', 'KochiB&W2.JPG',
+                    'KochiB&W3.JPG', 'KochiB&W4.JPG', 'KochiB&W5.JPG',
+                    'KochiB&W6.JPG', 'KochiB&W7.JPG', 'KochiB&W8.JPG',
+                    'StreetofKochi_1.JPG', 'StreetofKochi_2.JPG', 'StreetofKochi_3.JPG',
+                    'StreetofKochi_4.JPG', 'StreetofKochi_5.JPG', 'StreetofKochi_6.JPG',
+                    'StreetofKochi_7.JPG', 'StreetofKochi_8.JPG', 'StreetofKochi_9.JPG'
+                ]
+            }
+        };
+
+        let currentCollection = null;
+        let currentImageIndex = 0;
+
+        function viewCollection(collectionKey, title) {
+            currentCollection = collections[collectionKey];
+            currentImageIndex = 0;
+
+            document.getElementById('collectionsView').classList.add('hide');
+            document.getElementById('backBtn').classList.add('show');
+            document.getElementById('galleryTitle').style.display = 'block';
+            document.getElementById('galleryTitle').textContent = title;
+            document.getElementById('statsText').textContent = `<strong>${currentCollection.files.length} Images</strong>`;
+
+            const gallery = document.getElementById('imageGallery');
+            gallery.innerHTML = '';
+            gallery.classList.add('show');
+
+            currentCollection.files.forEach((file, index) => {
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.onclick = () => openModal(index);
+                card.innerHTML = `
+                    <img src="${currentCollection.folder}/${file}" alt="${file}" loading="lazy">
+                    <div class="image-name">${file}</div>
+                `;
+                gallery.appendChild(card);
+            });
+
+            document.getElementById('fileCount').style.display = 'inline-block';
+            document.getElementById('fileCount').textContent = `${currentCollection.files.length} files`;
+        }
+
+        function goBack() {
+            document.getElementById('collectionsView').classList.remove('hide');
+            document.getElementById('backBtn').classList.remove('show');
+            document.getElementById('galleryTitle').style.display = 'none';
+            document.getElementById('imageGallery').classList.remove('show');
+            document.getElementById('fileCount').style.display = 'none';
+            document.getElementById('statsText').textContent = '<strong>Total Files: 37</strong>';
+            currentCollection = null;
+        }
+
+        function openModal(index) {
+            currentImageIndex = index;
+            const file = currentCollection.files[index];
+            const imagePath = `${currentCollection.folder}/${file}`;
+            
+            document.getElementById('modalImage').src = imagePath;
+            document.getElementById('modalImageName').textContent = `${index + 1} / ${currentCollection.files.length}: ${file}`;
+            document.getElementById('imageModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('show');
+        }
+
+        function showNextImage() {
+            currentImageIndex = (currentImageIndex + 1) % currentCollection.files.length;
+            openModal(currentImageIndex);
+        }
+
+        function showPrevImage() {
+            currentImageIndex = (currentImageIndex - 1 + currentCollection.files.length) % currentCollection.files.length;
+            openModal(currentImageIndex);
+        }
+
+        document.getElementById('backBtn').addEventListener('click', goBack);
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('modalNext').addEventListener('click', showNextImage);
+        document.getElementById('modalPrev').addEventListener('click', showPrevImage);
+
+        document.getElementById('imageModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('imageModal').classList.contains('show')) {
+                if (event.key === 'ArrowRight') showNextImage();
+                if (event.key === 'ArrowLeft') showPrevImage();
+                if (event.key === 'Escape') closeModal();
+            }
+        });
+    </script>
 </body>
 </html>
