@@ -1,0 +1,42 @@
+title: El_photography
+url:  http://127.0.0.1:4000
+baseurl: 
+
+author: Disha Patel
+description: Discovering the world with my vision.
+
+include: ['_pages']
+
+collections_dir: series
+
+collections:
+  home:
+    output: true
+  pondi:
+    output: true
+  kochi:
+    output: true
+  rj_women:
+    output: true
+  venice:
+    output: true
+  chinatown:
+    output: true
+  rimi:
+    output: true
+  london:
+    output: true
+  mumbai:
+    output: true
+  cn_fishnet:
+    output: true
+  market:
+    output: true 
+  bastilleday:
+    output: true
+  kathakali:
+    output: true  
+    
+markdown: kramdown
+kramdown:
+  input: GFM
