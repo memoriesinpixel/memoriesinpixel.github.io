@@ -2,19 +2,4 @@
 layout: default
 ---
 
-<section class="gallery">
-  {% assign gallery_files = site.static_files | where_exp: "file", "file.path contains 'images/'" %}
-  {% if gallery_files and gallery_files.size > 0 %}
-    {% for file in gallery_files %}
-      {% assign filename = file.path | split: '/' | last %}
-      {% assign base = filename | split: '.' | first %}
-      {% assign caption = base | replace: '-', ' ' | replace: '_', ' ' %}
-      <a class="gallery-item" href="{{ file.path | relative_url }}" target="_blank" rel="noopener">
-        <img src="{{ file.path | relative_url }}" alt="{{ caption }}" loading="lazy" />
-        <div class="caption">{{ caption }}</div>
-      </a>
-    {% endfor %}
-  {% else %}
-    <p class="empty">Add images to the <code>images/</code> folder to populate your gallery.</p>
-  {% endif %}
-</section>
+{% include folder_browser.html %}

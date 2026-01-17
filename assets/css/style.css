@@ -112,8 +112,139 @@ main {
   color: #fff;
 }
 
+/* Folder Browser Styles */
+.folder-browser {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.breadcrumb {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.breadcrumb-item {
+  color: #bbb;
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-item:hover {
+  color: #fff;
+  background-color: #222;
+}
+
+.breadcrumb-item.active {
+  color: #fff;
+  background-color: #333;
+}
+
+.breadcrumb-item:not(:last-child)::after {
+  content: "›";
+  margin-left: 0.5rem;
+  margin-right: 0;
+  color: #555;
+}
+
+.folder-view {
+  position: relative;
+}
+
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.folder-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.folder-card:hover {
+  transform: translateY(-4px);
+}
+
+.folder-thumbnail {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+.folder-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.folder-card:hover .folder-overlay {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+}
+
+.folder-icon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+}
+
+.folder-info {
+  margin-top: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+.folder-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0.25rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-info p {
+  font-size: 0.8rem;
+  color: #999;
+  margin: 0.25rem 0;
+}
+
+.images-section {
+  grid-column: 1 / -1;
+  margin-top: 1.5rem;
+}
+
+.images-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #e0e0e0;
+}
+
 @media (max-width: 600px) {
   .site-title {
     font-size: 1.8rem;
+  }
+
+  .folder-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .breadcrumb {
+    font-size: 0.85rem;
   }
 }

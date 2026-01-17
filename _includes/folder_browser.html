@@ -1,0 +1,282 @@
+{% comment %}
+This include generates folder structure as JSON and renders the interactive folder browser.
+It scans site.static_files for all paths under images/ and builds a nested folder tree.
+{% endcomment %}
+
+<script id="folderData" type="application/json">
+{
+  "folders": [
+    {% assign image_files = site.static_files | where_exp: "file", "file.path contains 'images/'" %}
+    {% assign folders_seen = "" | split: "" %}
+    {% assign folder_data = "" %}
+    
+    {% for file in image_files %}
+      {% assign path_parts = file.path | split: "/" %}
+      {% if path_parts.size > 2 %}
+        {% assign folder_name = path_parts[1] %}
+        {% assign folder_key = "images/" | append: folder_name %}
+        
+        {% if folders_seen contains folder_key %}
+        {% else %}
+          {% assign folders_seen = folders_seen | push: folder_key %}
+          {% assign folder_images = site.static_files | where_exp: "f", "f.path contains folder_key" | where_exp: "f", "f.extname == '.jpg' or f.extname == '.jpeg' or f.extname == '.png' or f.extname == '.gif' or f.extname == '.webp'" %}
+          
+          {% if folder_images.size > 0 %}
+            {% assign random_index = site.time | date: "%s" | modulo: folder_images.size %}
+            {% assign thumbnail = folder_images[random_index] %}
+            
+    {
+      "name": "{{ folder_name }}",
+      "path": "{{ folder_key }}",
+      "thumbnail": "{{ thumbnail.path | relative_url }}",
+      "imageCount": {{ folder_images.size }}
+    }{% unless forloop.last %},{% endunless %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+
+<div class="folder-browser">
+  <div class="breadcrumb">
+    <a href="#" class="breadcrumb-item" data-path="">Home</a>
+  </div>
+
+  <div class="folder-view">
+    <div class="folder-grid" id="folderGrid">
+      <!-- Dynamically populated by JavaScript -->
+    </div>
+    <div class="gallery" id="imageGallery" style="display: none;">
+      <!-- Images appear here when a folder is selected -->
+    </div>
+  </div>
+</div>
+
+<script>
+  const folderDataEl = document.getElementById('folderData');
+  const folderData = JSON.parse(folderDataEl.textContent);
+  const folderGrid = document.getElementById('folderGrid');
+  const imageGallery = document.getElementById('imageGallery');
+  const breadcrumb = document.querySelector('.breadcrumb');
+
+  let currentPath = '';
+  let folderCache = {}; // Cache for folder contents
+
+  // Preload all folder data
+  function preloadFolderContents() {
+    folderData.folders.forEach(folder => {
+      folderCache[folder.path] = [];
+    });
+
+    // For each top-level folder, scan static_files
+    {% assign all_image_files = site.static_files | where_exp: "file", "file.path contains 'images/'" %}
+    
+    const allFiles = [
+      {% for file in all_image_files %}
+        {
+          path: "{{ file.path | relative_url }}",
+          name: "{{ file.path | split: '/' | last }}",
+          folder: "{{ file.path | replace: file.path | split: '/' | last | prepend: '' }}"
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+
+    // This would be better but let's use a simpler approach
+  }
+
+  function showFolders(parentPath = '') {
+    folderGrid.innerHTML = '';
+    imageGallery.style.display = 'none';
+    folderGrid.style.display = 'grid';
+
+    if (parentPath === '') {
+      // Show root folders
+      folderData.folders.forEach(folder => {
+        const card = createFolderCard(folder);
+        folderGrid.appendChild(card);
+      });
+    } else {
+      // Show subfolders and images
+      const subItems = getSubItems(parentPath);
+      if (subItems.folders.length > 0 || subItems.images.length > 0) {
+        subItems.folders.forEach(folder => {
+          const card = createFolderCard(folder);
+          folderGrid.appendChild(card);
+        });
+        if (subItems.images.length > 0) {
+          showImages(subItems.images, parentPath);
+        }
+      }
+    }
+  }
+
+  function createFolderCard(folder) {
+    const card = document.createElement('div');
+    card.className = 'folder-card';
+    card.innerHTML = `
+      <div class="folder-thumbnail" style="background-image: url('${folder.thumbnail}');">
+        <div class="folder-overlay">
+          <span class="folder-icon">📁</span>
+        </div>
+      </div>
+      <div class="folder-info">
+        <h3>${folder.name}</h3>
+        <p>${folder.imageCount} image(s)</p>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      currentPath = folder.path;
+      updateBreadcrumb(folder.path);
+      showFolders(folder.path);
+    });
+    return card;
+  }
+
+  function getSubItems(parentPath) {
+    const result = { folders: [], images: [] };
+    {% assign all_static = site.static_files | where_exp: "file", "file.path contains 'images/'" %}
+    
+    // Get all files under this path
+    const pathFiles = [
+      {% for file in all_static %}
+        {% assign relPath = file.path | replace: 'images/', '' %}
+        {
+          path: "{{ file.path | relative_url }}",
+          name: "{{ file.path | split: '/' | last }}",
+          fullPath: "{{ file.path }}",
+          ext: "{{ file.extname }}"
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+
+    const pathSegments = parentPath.split('/').filter(s => s);
+    const isImageFile = ext => ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext.toLowerCase());
+
+    pathFiles.forEach(file => {
+      const fileSegments = file.fullPath.split('/').filter(s => s);
+      
+      if (fileSegments.length > pathSegments.length) {
+        let match = true;
+        for (let i = 0; i < pathSegments.length; i++) {
+          if (fileSegments[i] !== pathSegments[i]) {
+            match = false;
+            break;
+          }
+        }
+        
+        if (match) {
+          const nextLevel = fileSegments[pathSegments.length];
+          if (nextLevel) {
+            if (isImageFile(file.ext)) {
+              if (fileSegments.length === pathSegments.length + 1) {
+                result.images.push(file);
+              }
+            } else {
+              // It's a subfolder
+              const nextFolder = 'images/' + fileSegments.slice(1, pathSegments.length + 2).join('/');
+              if (!result.folders.find(f => f.path === nextFolder)) {
+                const imageCount = pathFiles.filter(f => {
+                  const fSegs = f.fullPath.split('/').filter(s => s);
+                  let match = true;
+                  for (let i = 0; i < pathSegments.length + 1; i++) {
+                    if (fSegs[i] !== fileSegments[i]) {
+                      match = false;
+                      break;
+                    }
+                  }
+                  return match && isImageFile(f.ext);
+                }).length;
+                
+                if (imageCount > 0) {
+                  result.folders.push({
+                    name: nextLevel,
+                    path: nextFolder,
+                    thumbnail: pathFiles.find(f => {
+                      const fSegs = f.fullPath.split('/').filter(s => s);
+                      let match = true;
+                      for (let i = 0; i <= pathSegments.length; i++) {
+                        if (!fSegs[i] || fSegs[i] !== fileSegments[i]) {
+                          match = false;
+                          break;
+                        }
+                      }
+                      return match && isImageFile(f.ext);
+                    })?.path || '',
+                    imageCount: imageCount
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return result;
+  }
+
+  function showImages(images, folderPath) {
+    if (images.length === 0) return;
+
+    const imageElements = images.map(img => `
+      <a class="gallery-item" href="${img.path}" target="_blank" rel="noopener">
+        <img src="${img.path}" alt="${img.name}" loading="lazy" />
+        <div class="caption">${img.name}</div>
+      </a>
+    `).join('');
+
+    const imagesSection = document.createElement('div');
+    imagesSection.className = 'images-section';
+    imagesSection.innerHTML = `
+      <h3>Images in this folder</h3>
+      <div class="gallery">
+        ${imageElements}
+      </div>
+    `;
+
+    folderGrid.appendChild(imagesSection);
+  }
+
+  function updateBreadcrumb(path) {
+    const crumbs = breadcrumb.querySelectorAll('.breadcrumb-item');
+    crumbs.forEach(crumb => {
+      if (crumb.getAttribute('data-path') === path) {
+        crumb.classList.add('active');
+      } else {
+        crumb.classList.remove('active');
+      }
+    });
+
+    const pathSegments = path.split('/').filter(s => s && s !== 'images');
+    let builtPath = '';
+
+    breadcrumb.innerHTML = '<a href="#" class="breadcrumb-item" data-path="">Home</a>';
+
+    pathSegments.forEach((segment, index) => {
+      builtPath += (builtPath ? '/' : 'images/') + segment;
+      const crumb = document.createElement('a');
+      crumb.className = 'breadcrumb-item';
+      crumb.href = '#';
+      crumb.textContent = segment;
+      crumb.setAttribute('data-path', builtPath);
+      breadcrumb.appendChild(crumb);
+    });
+
+    breadcrumb.querySelectorAll('.breadcrumb-item').forEach(crumb => {
+      crumb.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentPath = crumb.getAttribute('data-path');
+        if (currentPath === '') {
+          showFolders();
+        } else {
+          showFolders(currentPath);
+        }
+      });
+    });
+  }
+
+  // Initialize
+  showFolders();
+</script>
