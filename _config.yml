@@ -1,0 +1,21 @@
+title: Memories in Pixel
+description: Photography · Travel · Nature · Stories
+email: youremail@example.com
+url: "https://memoriesinpixel.github.io"
+baseurl: ""
+markdown: kramdown
+theme: null
+plugins:
+  - jekyll-seo-tag
+
+# Build settings
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - README.md
+
+collections:
+  # Define collections here later if needed
+  # posts:
+  #   output: true

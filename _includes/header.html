@@ -1,0 +1,12 @@
+<header class="site-header">
+  <h1 class="site-title">{{ site.title }}</h1>
+  {% if site.description %}
+    <p class="site-subtitle">{{ site.description }}</p>
+  {% endif %}
+  <nav class="site-nav">
+    <a href="{{ "/" | relative_url }}">Home</a>
+    <a href="{{ "/portfolio/" | relative_url }}">Portfolio</a>
+    <a href="{{ "/about/" | relative_url }}">About</a>
+    <a href="{{ "/contact/" | relative_url }}">Contact</a>
+  </nav>
+</header>
