@@ -112,6 +112,73 @@ main {
   color: #fff;
 }
 
+/* Random Photo Display */
+.random-photo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.random-photo-wrapper {
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+#randomPhoto {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.next-photo-btn {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #333, #1a1a1a);
+  border: 1px solid #555;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.next-photo-btn:hover {
+  background: linear-gradient(135deg, #444, #222);
+  border-color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.next-photo-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .random-photo-container {
+    padding: 1rem;
+  }
+
+  .random-photo-wrapper {
+    margin-bottom: 1.5rem;
+  }
+
+  .next-photo-btn {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
 /* Folder Browser Styles */
 .folder-browser {
   padding: 2rem;
