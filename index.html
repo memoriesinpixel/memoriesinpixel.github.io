@@ -3,77 +3,35 @@
 <head>
   <meta charset="utf-8">
   <title>{{ site.title }}</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    :root{--bg:#fafafa;--card:#fff;--muted:#666;--accent:#2b7cff}
-    body{font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#222;margin:0;padding:24px}
-    .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:24px;margin:0}
-    .sub{color:var(--muted);font-size:14px}
-
-    .controls{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-    .section{background:var(--card);padding:14px;border-radius:8px;box-shadow:0 1px 4px rgba(20,20,20,0.04);}
-
-    .list{display:flex;flex-wrap:wrap;gap:10px}
-    .item{cursor:pointer;padding:8px 12px;border-radius:6px;border:1px solid #eee;background:linear-gradient(180deg,#fff,#f8f9fb);transition:transform .08s ease,box-shadow .08s ease}
-    .item:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(10,30,60,0.06)}
-    .count{color:var(--muted);font-size:13px;margin-left:8px}
-
-    #gallery{display:none;margin-top:18px}
-    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
-    .gallery-grid img{width:100%;height:140px;object-fit:cover;border-radius:6px}
-
-    .featured{margin-top:18px;display:flex;align-items:center;gap:12px}
-    .featured img{width:300px;height:200px;object-fit:cover;border-radius:8px;box-shadow:0 6px 18px rgba(10,30,60,0.08)}
-    .featured .meta{font-size:14px;color:var(--muted)}
-
-    .back{display:inline-block;margin-bottom:12px;cursor:pointer;color:var(--accent)}
-
-    footer{margin-top:36px;padding:18px;text-align:center;color:var(--muted)}
-
-    @media (max-width:600px){
-      .featured{flex-direction:column}
-      .featured img{width:100%;height:auto}
-    }
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#fff;color:#222}
+    .section{margin-bottom:20px}
+    .item{cursor:pointer;padding:8px;border:1px solid #ccc;margin:5px;display:inline-block;border-radius:4px}
+    .count{color:#666;margin-left:6px;font-size:90%}
+    .gallery img{max-width:200px;margin:5px}
+    .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue}
+    h1{margin:0 0 12px 0}
+    footer{margin-top:36px;padding:18px;text-align:center;color:#666}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>{{ site.full_name }}</h1>
-        <div class="sub">A simple gallery — browse albums or categories</div>
-      </div>
-      <div class="sub">{{ site.title }}</div>
-    </header>
+  <h1>{{ site.full_name }}</h1>
 
-    <div class="controls">
-      <div class="section" style="min-width:260px">
-        <strong>Albums</strong>
-        <div id="albums" class="list" style="margin-top:10px"></div>
-      </div>
-
-      <div class="section" style="min-width:260px">
-        <strong>Categories</strong>
-        <div id="categories" class="list" style="margin-top:10px"></div>
-      </div>
-    </div>
-
-    <div id="featuredSection" class="section" style="display:none">
-      <strong>Featured</strong>
-      <div id="featured" class="featured" style="margin-top:12px"></div>
-    </div>
-
-    <div id="gallery" class="section">
-      <!-- gallery content injected here -->
-    </div>
-
-    <footer>
-      Thanks for visiting this site — have a great day!
-      <div style="margin-top:12px;">Thank you for checking out my gallery!</div>
-    </footer>
+  <div class="section">
+    <strong>Albums:</strong>
+    <div id="albums"></div>
   </div>
+
+  <div class="section">
+    <strong>Categories:</strong>
+    <div id="categories"></div>
+  </div>
+
+  <div id="gallery" style="display:none"></div>
+
+  <footer>
+    Thanks for visiting this site — have a great day!
+  </footer>
 
   <script>
     var files = [
@@ -85,13 +43,12 @@
       {% endfor %}
     ];
 
-    // maps
-    var albumsMap = {}; // album => [paths]
-    var categoriesMap = {}; // key => { display, items }
+    var albumsMap = {};
+    var categoriesMap = {};
 
     files.forEach(function(path){
       var parts = path.replace(/^\/+/,'').split('/');
-      if(parts.length < 3) return; // need images/<album>/<file>
+      if(parts.length < 3) return;
       var album = parts[1];
       albumsMap[album] = albumsMap[album] || [];
       albumsMap[album].push(path);
@@ -108,68 +65,54 @@
     var albumsEl = document.getElementById('albums');
     var categoriesEl = document.getElementById('categories');
     var galleryEl = document.getElementById('gallery');
-    var featuredSection = document.getElementById('featuredSection');
-    var featuredEl = document.getElementById('featured');
 
-    function makeItem(text,count,onclick){
+    function makeNode(text, count, onClick){
       var el = document.createElement('div');
       el.className = 'item';
       el.textContent = text + ' ';
-      var c = document.createElement('span'); c.className='count'; c.textContent = '('+count+')';
+      var c = document.createElement('span'); c.className = 'count'; c.textContent = '('+count+')';
       el.appendChild(c);
-      el.onclick = onclick;
+      el.onclick = onClick;
       return el;
     }
 
     function renderAlbums(){
-      albumsEl.innerHTML='';
-      Object.keys(albumsMap).sort().forEach(function(album){
-        albumsEl.appendChild(makeItem(album, albumsMap[album].length, function(){ openGallery('Album: '+album, albumsMap[album]); }));
+      albumsEl.innerHTML = '';
+      Object.keys(albumsMap).sort().forEach(function(a){
+        albumsEl.appendChild(makeNode(a, albumsMap[a].length, function(){ openGallery('Album: '+a, albumsMap[a]); }));
       });
     }
 
     function renderCategories(){
-      categoriesEl.innerHTML='';
-      Object.keys(categoriesMap).sort().forEach(function(key){
-        var c = categoriesMap[key];
-        categoriesEl.appendChild(makeItem(c.display, c.items.length, function(){ openGallery('Category: '+c.display, c.items); }));
+      categoriesEl.innerHTML = '';
+      Object.keys(categoriesMap).sort().forEach(function(k){
+        var c = categoriesMap[k];
+        categoriesEl.appendChild(makeNode(c.display, c.items.length, function(){ openGallery('Category: '+c.display, c.items); }));
       });
     }
 
     function openGallery(title, items){
-      featuredSection.style.display='none';
-      galleryEl.style.display='block';
-      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back</div><h2 style="margin-top:6px">'+title+'</h2><div class="gallery-grid" style="margin-top:12px"></div>';
-      var grid = galleryEl.querySelector('.gallery-grid');
+      albumsEl.style.display = 'none';
+      categoriesEl.style.display = 'none';
+      galleryEl.style.display = 'block';
+      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back</div><h2>'+title+'</h2><div class="gallery"></div>';
+      var grid = galleryEl.querySelector('.gallery');
       items.forEach(function(src){
         var img = document.createElement('img'); img.src = src; img.alt = title; grid.appendChild(img);
       });
-      window.scrollTo({top:0,behavior:'smooth'});
+      window.scrollTo(0,0);
     }
 
     function closeGallery(){
-      galleryEl.style.display='none';
-      galleryEl.innerHTML='';
-      featuredSection.style.display = (files.length>0)?'block':'none';
-      window.scrollTo({top:0,behavior:'smooth'});
+      galleryEl.style.display = 'none';
+      galleryEl.innerHTML = '';
+      albumsEl.style.display = '';
+      categoriesEl.style.display = '';
+      window.scrollTo(0,0);
     }
 
-    function showRandomFeature(){
-      if(files.length===0){ featuredSection.style.display='none'; return; }
-      featuredSection.style.display='block';
-      var idx = Math.floor(Math.random()*files.length);
-      var src = files[idx];
-      featuredEl.innerHTML = '';
-      var img = document.createElement('img'); img.src = src; img.alt = 'Featured';
-      var meta = document.createElement('div'); meta.className='meta';
-      var name = src.split('/').pop();
-      meta.innerHTML = '<div><strong>'+name+'</strong></div><div style="margin-top:6px"><button id="another">Show another</button></div>';
-      featuredEl.appendChild(img); featuredEl.appendChild(meta);
-      document.getElementById('another').onclick = showRandomFeature;
-    }
-
-    // initial render
-    renderAlbums(); renderCategories(); showRandomFeature();
+    renderAlbums();
+    renderCategories();
   </script>
 </body>
 </html>
