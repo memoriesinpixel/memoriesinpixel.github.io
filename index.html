@@ -12,6 +12,7 @@
     .gallery img{max-width:200px;margin:5px}
     .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue}
     .label{font-weight:700;margin-right:8px}
+    .count{color:#666;margin-left:6px;font-size:90%}
   </style>
 </head>
 <body>
@@ -30,6 +31,7 @@
   <div id="gallery" style="display:none"></div>
 
   <script>
+    // Build an array of image file paths at build time using Jekyll's site.static_files
     var files = [
       {% for file in site.static_files %}
         {% assign p = file.path %}
@@ -39,23 +41,27 @@
       {% endfor %}
     ];
 
-    var albumsMap = {};
-    var categoriesMap = {};
+    // Maps and sets for albums and categories
+    var albumsMap = {}; // albumName => [paths]
+    var categoriesMap = {}; // categoryKey => { display: originalFirstWord, items: [paths] }
 
     files.forEach(function(path){
-      var parts = path.replace(/^\/+,'').split('/');
-      if(parts.length < 2) return;
+      // Normalize and split: expect paths like /images/<album>/<file>
+      var parts = path.replace(/^\/+/,'').split('/');
+      if(parts.length < 3) return; // need images/<album>/<file>
+
       var album = parts[1];
       albumsMap[album] = albumsMap[album] || [];
       albumsMap[album].push(path);
 
-      var filename = parts[parts.length-1];
-      var base = filename.replace(/\.[^/.]+$/,'');
-      // first word as category: split on non-alphanumeric characters
+      var filename = parts[parts.length - 1];
+      var base = filename.replace(/\.[^/.]+$/, '');
+      // Get the first word: split on non-alphanumeric characters
       var first = base.split(/[^A-Za-z0-9]+/)[0] || base;
-      var category = first.toLowerCase();
-      categoriesMap[category] = categoriesMap[category] || { display: first, items: [] };
-      categoriesMap[category].items.push(path);
+      var key = first.toLowerCase();
+      var display = first.charAt(0).toUpperCase() + first.slice(1);
+      categoriesMap[key] = categoriesMap[key] || { display: display, items: [] };
+      categoriesMap[key].items.push(path);
     });
 
     var albumsEl = document.getElementById('albums');
@@ -64,10 +70,14 @@
 
     function renderAlbums(){
       albumsEl.innerHTML = '';
-      Object.keys(albumsMap).forEach(function(album){
+      Object.keys(albumsMap).sort().forEach(function(album){
         var el = document.createElement('div');
         el.className = 'item';
-        el.textContent = album;
+        el.textContent = album + ' ';
+        var count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = '(' + albumsMap[album].length + ')';
+        el.appendChild(count);
         el.onclick = function(){ openGallery(album, albumsMap[album], 'Album: ' + album); };
         albumsEl.appendChild(el);
       });
@@ -75,11 +85,16 @@
 
     function renderCategories(){
       categoriesEl.innerHTML = '';
-      Object.keys(categoriesMap).forEach(function(key){
+      Object.keys(categoriesMap).sort().forEach(function(key){
+        var c = categoriesMap[key];
         var el = document.createElement('div');
         el.className = 'item';
-        el.textContent = categoriesMap[key].display;
-        el.onclick = function(){ openGallery(categoriesMap[key].display, categoriesMap[key].items, 'Category: ' + categoriesMap[key].display); };
+        el.textContent = c.display + ' ';
+        var count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = '(' + c.items.length + ')';
+        el.appendChild(count);
+        el.onclick = function(){ openGallery(c.display, c.items, 'Category: ' + c.display); };
         categoriesEl.appendChild(el);
       });
     }
@@ -95,7 +110,6 @@
         img.alt = name;
         galleryEl.appendChild(img);
       });
-      // scroll to top of gallery
       window.scrollTo(0,0);
     }
 
