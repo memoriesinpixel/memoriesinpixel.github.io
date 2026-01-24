@@ -1,39 +1,37 @@
+---
+---
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <title>{{ site.title }}</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;padding:20px;background:#fff;color:#222}
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;}
     .section{margin-bottom:20px}
-    .item{cursor:pointer;padding:8px;border:1px solid #ccc;margin:5px;display:inline-block;border-radius:4px}
-    .count{color:#666;margin-left:6px;font-size:90%}
+    .item{cursor:pointer;padding:10px;border:1px solid #ccc;margin:5px;display:inline-block}
     .gallery img{max-width:200px;margin:5px}
     .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue}
-    h1{margin:0 0 12px 0}
-    footer{margin-top:36px;padding:18px;text-align:center;color:#666}
+    .label{font-weight:700;margin-right:8px}
+    .count{color:#666;margin-left:6px;font-size:90%}
   </style>
 </head>
 <body>
   <h1>{{ site.full_name }}</h1>
 
   <div class="section">
-    <strong>Albums:</strong>
-    <div id="albums"></div>
+    <span class="label">Albums:</span>
+    <div id="albums" style="display:inline-block"></div>
   </div>
 
   <div class="section">
-    <strong>Categories:</strong>
-    <div id="categories"></div>
+    <span class="label">Categories:</span>
+    <div id="categories" style="display:inline-block"></div>
   </div>
 
   <div id="gallery" style="display:none"></div>
 
-  <footer>
-    Thanks for visiting this site — have a great day!
-  </footer>
-
   <script>
+    // Build an array of image file paths at build time using Jekyll's site.static_files
     var files = [
       {% for file in site.static_files %}
         {% assign p = file.path %}
@@ -43,18 +41,22 @@
       {% endfor %}
     ];
 
-    var albumsMap = {};
-    var categoriesMap = {};
+    // Maps and sets for albums and categories
+    var albumsMap = {}; // albumName => [paths]
+    var categoriesMap = {}; // categoryKey => { display: originalFirstWord, items: [paths] }
 
     files.forEach(function(path){
-      var parts = path.replace(/^\/+/,'').split('/');
-      if(parts.length < 3) return;
+      // Normalize and split: expect paths like /images/<album>/<file>
+      var parts = path.replace(/^\/+,'').split('/');
+      if(parts.length < 3) return; // need images/<album>/<file>
+
       var album = parts[1];
       albumsMap[album] = albumsMap[album] || [];
       albumsMap[album].push(path);
 
-      var filename = parts[parts.length-1];
-      var base = filename.replace(/\.[^/.]+$/,'');
+      var filename = parts[parts.length - 1];
+      var base = filename.replace(/\.[^/.]+$/, '');
+      // Get the first word: split on non-alphanumeric characters
       var first = base.split(/[^A-Za-z0-9]+/)[0] || base;
       var key = first.toLowerCase();
       var display = first.charAt(0).toUpperCase() + first.slice(1);
@@ -66,49 +68,56 @@
     var categoriesEl = document.getElementById('categories');
     var galleryEl = document.getElementById('gallery');
 
-    function makeNode(text, count, onClick){
-      var el = document.createElement('div');
-      el.className = 'item';
-      el.textContent = text + ' ';
-      var c = document.createElement('span'); c.className = 'count'; c.textContent = '('+count+')';
-      el.appendChild(c);
-      el.onclick = onClick;
-      return el;
-    }
-
     function renderAlbums(){
       albumsEl.innerHTML = '';
-      Object.keys(albumsMap).sort().forEach(function(a){
-        albumsEl.appendChild(makeNode(a, albumsMap[a].length, function(){ openGallery('Album: '+a, albumsMap[a]); }));
+      Object.keys(albumsMap).sort().forEach(function(album){
+        var el = document.createElement('div');
+        el.className = 'item';
+        el.textContent = album + ' ';
+        var count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = '(' + albumsMap[album].length + ')';
+        el.appendChild(count);
+        el.onclick = function(){ openGallery(album, albumsMap[album], 'Album: ' + album); };
+        albumsEl.appendChild(el);
       });
     }
 
     function renderCategories(){
       categoriesEl.innerHTML = '';
-      Object.keys(categoriesMap).sort().forEach(function(k){
-        var c = categoriesMap[k];
-        categoriesEl.appendChild(makeNode(c.display, c.items.length, function(){ openGallery('Category: '+c.display, c.items); }));
+      Object.keys(categoriesMap).sort().forEach(function(key){
+        var c = categoriesMap[key];
+        var el = document.createElement('div');
+        el.className = 'item';
+        el.textContent = c.display + ' ';
+        var count = document.createElement('span');
+        count.className = 'count';
+        count.textContent = '(' + c.items.length + ')';
+        el.appendChild(count);
+        el.onclick = function(){ openGallery(c.display, c.items, 'Category: ' + c.display); };
+        categoriesEl.appendChild(el);
       });
     }
 
-    function openGallery(title, items){
+    function openGallery(name, items, title){
       albumsEl.style.display = 'none';
       categoriesEl.style.display = 'none';
       galleryEl.style.display = 'block';
-      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back</div><h2>'+title+'</h2><div class="gallery"></div>';
-      var grid = galleryEl.querySelector('.gallery');
+      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back</div><h2>' + (title || name) + '</h2>';
       items.forEach(function(src){
-        var img = document.createElement('img'); img.src = src; img.alt = title; grid.appendChild(img);
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = name;
+        galleryEl.appendChild(img);
       });
       window.scrollTo(0,0);
     }
 
     function closeGallery(){
       galleryEl.style.display = 'none';
+      albumsEl.style.display = 'inline-block';
+      categoriesEl.style.display = 'inline-block';
       galleryEl.innerHTML = '';
-      albumsEl.style.display = '';
-      categoriesEl.style.display = '';
-      window.scrollTo(0,0);
     }
 
     renderAlbums();
