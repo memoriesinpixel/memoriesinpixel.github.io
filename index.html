@@ -7,14 +7,26 @@
   <title>{{ site.title }}</title>
   <style>
     body{font-family:Arial,Helvetica,sans-serif;padding:20px;}
-    .album{cursor:pointer;padding:10px;border:1px solid #ccc;margin:5px;display:inline-block;}
-    .gallery img{max-width:200px;margin:5px;}
-    .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue;}
+    .section{margin-bottom:20px}
+    .item{cursor:pointer;padding:10px;border:1px solid #ccc;margin:5px;display:inline-block}
+    .gallery img{max-width:200px;margin:5px}
+    .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue}
+    .label{font-weight:700;margin-right:8px}
   </style>
 </head>
 <body>
   <h1>{{ site.full_name }}</h1>
-  <div id="albums"></div>
+
+  <div class="section">
+    <span class="label">Albums:</span>
+    <div id="albums" style="display:inline-block"></div>
+  </div>
+
+  <div class="section">
+    <span class="label">Categories:</span>
+    <div id="categories" style="display:inline-block"></div>
+  </div>
+
   <div id="gallery" style="display:none"></div>
 
   <script>
@@ -28,47 +40,74 @@
     ];
 
     var albumsMap = {};
+    var categoriesMap = {};
+
     files.forEach(function(path){
-      var parts = path.replace(/^\/+/,'').split('/');
+      var parts = path.replace(/^\/+,'').split('/');
       if(parts.length < 2) return;
       var album = parts[1];
       albumsMap[album] = albumsMap[album] || [];
       albumsMap[album].push(path);
+
+      var filename = parts[parts.length-1];
+      var base = filename.replace(/\.[^/.]+$/,'');
+      // first word as category: split on non-alphanumeric characters
+      var first = base.split(/[^A-Za-z0-9]+/)[0] || base;
+      var category = first.toLowerCase();
+      categoriesMap[category] = categoriesMap[category] || { display: first, items: [] };
+      categoriesMap[category].items.push(path);
     });
 
     var albumsEl = document.getElementById('albums');
+    var categoriesEl = document.getElementById('categories');
     var galleryEl = document.getElementById('gallery');
 
     function renderAlbums(){
       albumsEl.innerHTML = '';
       Object.keys(albumsMap).forEach(function(album){
         var el = document.createElement('div');
-        el.className = 'album';
+        el.className = 'item';
         el.textContent = album;
-        el.onclick = function(){ openAlbum(album); };
+        el.onclick = function(){ openGallery(album, albumsMap[album], 'Album: ' + album); };
         albumsEl.appendChild(el);
       });
     }
 
-    function openAlbum(album){
+    function renderCategories(){
+      categoriesEl.innerHTML = '';
+      Object.keys(categoriesMap).forEach(function(key){
+        var el = document.createElement('div');
+        el.className = 'item';
+        el.textContent = categoriesMap[key].display;
+        el.onclick = function(){ openGallery(categoriesMap[key].display, categoriesMap[key].items, 'Category: ' + categoriesMap[key].display); };
+        categoriesEl.appendChild(el);
+      });
+    }
+
+    function openGallery(name, items, title){
       albumsEl.style.display = 'none';
+      categoriesEl.style.display = 'none';
       galleryEl.style.display = 'block';
-      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back to albums</div>';
-      albumsMap[album].forEach(function(src){
+      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back</div><h2>' + (title || name) + '</h2>';
+      items.forEach(function(src){
         var img = document.createElement('img');
         img.src = src;
-        img.alt = album;
+        img.alt = name;
         galleryEl.appendChild(img);
       });
+      // scroll to top of gallery
+      window.scrollTo(0,0);
     }
 
     function closeGallery(){
       galleryEl.style.display = 'none';
-      albumsEl.style.display = 'block';
+      albumsEl.style.display = 'inline-block';
+      categoriesEl.style.display = 'inline-block';
       galleryEl.innerHTML = '';
     }
 
     renderAlbums();
+    renderCategories();
   </script>
 </body>
 </html>
