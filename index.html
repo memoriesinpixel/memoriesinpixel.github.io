@@ -1,116 +1,59 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Photography Gallery — Filter by Category</title>
-  <style>
-    :root{--gap:12px;--btn-bg:#111;--btn-fg:#fff;--accent:#2dd4bf}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:20px;background:#fafafa;color:#111}
-    h1{margin:0 0 12px;font-size:1.4rem}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-    .controls button{background:var(--btn-bg);color:var(--btn-fg);border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
-    .controls button.active{background:var(--accent);color:#022}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:var(--gap)}
-    .card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 6px 18px rgba(16,24,40,0.06);display:flex;flex-direction:column}
-    .thumb{display:block;width:100%;height:160px;object-fit:cover;background:#e6e6e6}
-    .meta{padding:10px 12px;font-size:0.9rem}
-    .meta .title{font-weight:600}
-    .meta .sub{color:#555;font-size:0.85rem;margin-top:6px}
-    .hidden{display:none !important}
-    @media (max-width:520px){ .thumb{height:130px} }
-  </style>
-</head>
-<body>
-  <h1>Portfolio — Browse by category</h1>
-
-  <div class="controls" id="filters">
-    <!-- Buttons will be created by JS; default "All" shown -->
-    <button data-filter="all" class="active">All</button>
-  </div>
-
-  <div class="grid" id="gallery">
-    <!-- Example items. Replace src with your images and data-category with csv categories. -->
-    <figure class="card" data-category="Street,Travel">
-      <img class="thumb" src="https://picsum.photos/id/1011/800/600" alt="Street 1" loading="lazy">
-      <figcaption class="meta">
-        <div class="title">Under the Overpass</div>
-        <div class="sub">Street — San Francisco • 2026-01-10</div>
-      </figcaption>
-    </figure>
-
-    <figure class="card" data-category="Landscape,Travel">
-      <img class="thumb" src="https://picsum.photos/id/1018/800/600" alt="Landscape 1" loading="lazy">
-      <figcaption class="meta">
-        <div class="title">Dawn Ridge</div>
-        <div class="sub">Landscape — Yosemite • 2025-09-02</div>
-      </figcaption>
-    </figure>
-
-    <figure class="card" data-category="Portrait,Editorial">
-      <img class="thumb" src="https://picsum.photos/id/1005/800/600" alt="Portrait 1" loading="lazy">
-      <figcaption class="meta">
-        <div class="title">Evelyn</div>
-        <div class="sub">Portrait — Studio • 2026-02-14</div>
-      </figcaption>
-    </figure>
-
-    <figure class="card" data-category="Wedding,Portrait">
-      <img class="thumb" src="https://picsum.photos/id/1027/800/600" alt="Wedding 1" loading="lazy">
-      <figcaption class="meta">
-        <div class="title">First Dance</div>
-        <div class="sub">Wedding — Reception • 2025-06-22</div>
-      </figcaption>
-    </figure>
-
-    <figure class="card" data-category="Commercial,Product">
-      <img class="thumb" src="https://picsum.photos/id/103/800/600" alt="Product 1" loading="lazy">
-      <figcaption class="meta">
-        <div class="title">Headphones — Hero</div>
-        <div class="sub">Commercial — Product • 2025-12-05</div>
-      </figcaption>
-    </figure>
-  </div>
-
+---
+---
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>{{ site.title }}</title>
+    {% include favicon.html %}
+    <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/zoom.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,900" rel="stylesheet">
+    <script src="https://use.fontawesome.com/4c9066f1a6.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <!--------------- YOUR NAME OVER HERE -------------->
+      <h2 class="header">{{ site.full_name }}</h2>
+      <div id="gallery">
+      </div>
+    </div>
+    <a href="https://github.com/andyzg/gallery"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+    <div class="footer">
+      <div class="links">
+        <a id="instagram" class="links__icon" href="https://www.instagram.com/{{ site.instagram }}">
+          <span class="view-ig"> View {{ site.full_name }}'s Instagram </span>
+          <i class="fa fa-instagram fa-lg"></i>
+        </a>
+      </div>
+    </div>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.js"
+    integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-beta.2/lazyload.js"></script>
+  <script src="js/transition.js"></script>
+  <script src="js/zoom.min.js"></script>
+  <script src="js/gallery.js"></script>
   <script>
-    // Build category buttons from dataset
-    (function(){
-      const grid = document.getElementById('gallery');
-      const controls = document.getElementById('filters');
-      const items = Array.from(grid.querySelectorAll('.card'));
-      const catSet = new Set();
+    var COLUMNS = 'columns';
+    var ROWS = 'rows';
+    var SQUARES = 'squares';
 
-      items.forEach(it => {
-        const raw = it.dataset.category || '';
-        raw.split(',').map(s=>s.trim()).filter(Boolean).forEach(c=>catSet.add(c));
-      });
+    var columns = COLUMNS;
+    var rows = ROWS;
+    var squares = SQUARES;
 
-      // add buttons for categories (in insertion order)
-      Array.from(catSet).sort().forEach(cat=>{
-        const btn = document.createElement('button');
-        btn.textContent = cat;
-        btn.dataset.filter = cat;
-        controls.appendChild(btn);
-      });
+    var layoutStyle = {{ site.layout_style }};
 
-      // click handler
-      controls.addEventListener('click', e=>{
-        if(!(e.target instanceof HTMLButtonElement)) return;
-        const filter = e.target.dataset.filter;
-        // toggle active state for visual feedback
-        Array.from(controls.querySelectorAll('button')).forEach(b=>b.classList.remove('active'));
-        e.target.classList.add('active');
-
-        items.forEach(it=>{
-          if(filter === 'all'){
-            it.classList.remove('hidden');
-            return;
-          }
-          const cats = (it.dataset.category||'').split(',').map(s=>s.trim());
-          it.classList.toggle('hidden', !cats.includes(filter));
-        });
-      });
-    })();
+    var configuration = {
+      spacing: {{ site.spacing }},
+      shuffle: {{ site.shuffle }},
+      columns: {{ site.columns }},
+      maxHeight: {{ site.max_height }}
+    };
   </script>
-</body>
+  <script src="js/script.js"></script>
+  {% include ga.html %}
 </html>
