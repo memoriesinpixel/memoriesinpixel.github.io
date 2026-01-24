@@ -1,68 +1,74 @@
 ---
 ---
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>{{ site.title }}</title>
-    {% include favicon.html %}
-    <link rel="stylesheet" type="text/css" href="css/reset.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" type="text/css" href="css/zoom.css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,900" rel="stylesheet">
-    <script src="https://use.fontawesome.com/4c9066f1a6.js"></script>
-  </head>
-  <body>
-    <div id="container">
-      <!--------------- YOUR NAME OVER HERE ------------>
-      <h2 class="header">{{ site.full_name }}</h2>
-      <div id="gallery">
-        {% for file in site.static_files %}
-          {% if file.path contains 'images/' %}
-            <figure class="gallery-item">
-              <a href="{{ file.path | relative_url }}" data-zoomable>
-                <img class="lazy" data-src="{{ file.path | relative_url }}" alt="{{ file.name }}">
-              </a>
-            </figure>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </div>
-    <a href="https://github.com/andyzg/gallery"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f692e696d6775722e636f6d2f7a6b6a6d6e2e706e67" /></a>
-    <div class="footer">
-      <div class="links">
-        <a id="instagram" class="links__icon" href="https://www.instagram.com/{{ site.instagram }}">
-          <span class="view-ig"> View {{ site.full_name }}'s Instagram </span>
-          <i class="fa fa-instagram fa-lg"></i>
-        </a>
-      </div>
-    </div>
-  </body>
-  <script
-    src="https://code.jquery.com/jquery-3.2.1.js"
-    integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-beta.2/lazyload.js"></script>
-  <script src="js/transition.js"></script>
-  <script src="js/zoom.min.js"></script>
-  <script src="js/gallery.js"></script>
+<head>
+  <meta charset="utf-8">
+  <title>{{ site.title }}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;padding:20px;}
+    .album{cursor:pointer;padding:10px;border:1px solid #ccc;margin:5px;display:inline-block;}
+    .gallery img{max-width:200px;margin:5px;}
+    .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue;}
+  </style>
+</head>
+<body>
+  <h1>{{ site.full_name }}</h1>
+  <div id="albums"></div>
+  <div id="gallery" style="display:none"></div>
+
   <script>
-    var COLUMNS = 'columns';
-    var ROWS = 'rows';
-    var SQUARES = 'squares';
+    var files = [
+      {% for file in site.static_files %}
+        {% assign p = file.path %}
+        {% if p contains 'images/' and (p contains '.jpg' or p contains '.jpeg' or p contains '.png' or p contains '.gif' or p contains '.webp') %}
+          "{{ file.path | relative_url }}",
+        {% endif %}
+      {% endfor %}
+    ];
 
-    var columns = COLUMNS;
-    var rows = ROWS;
-    var squares = SQUARES;
+    var albumsMap = {};
+    files.forEach(function(path){
+      var parts = path.replace(/^\/+/,'').split('/');
+      if(parts.length < 2) return;
+      var album = parts[1];
+      albumsMap[album] = albumsMap[album] || [];
+      albumsMap[album].push(path);
+    });
 
-    var layoutStyle = {{ site.layout_style }};
+    var albumsEl = document.getElementById('albums');
+    var galleryEl = document.getElementById('gallery');
 
-    var configuration = {
-      spacing: {{ site.spacing }},
-      shuffle: {{ site.shuffle }},
-      columns: {{ site.columns }},
-      maxHeight: {{ site.max_height }}
-    };
+    function renderAlbums(){
+      albumsEl.innerHTML = '';
+      Object.keys(albumsMap).forEach(function(album){
+        var el = document.createElement('div');
+        el.className = 'album';
+        el.textContent = album;
+        el.onclick = function(){ openAlbum(album); };
+        albumsEl.appendChild(el);
+      });
+    }
+
+    function openAlbum(album){
+      albumsEl.style.display = 'none';
+      galleryEl.style.display = 'block';
+      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back to albums</div>';
+      albumsMap[album].forEach(function(src){
+        var img = document.createElement('img');
+        img.src = src;
+        img.alt = album;
+        galleryEl.appendChild(img);
+      });
+    }
+
+    function closeGallery(){
+      galleryEl.style.display = 'none';
+      albumsEl.style.display = 'block';
+      galleryEl.innerHTML = '';
+    }
+
+    renderAlbums();
   </script>
-  <script src="js/script.js"></script>
-  {% include ga.html %}
+</body>
 </html>
