@@ -6,32 +6,44 @@
   <meta charset="utf-8">
   <title>{{ site.title }}</title>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;padding:20px;}
-    .section{margin-bottom:20px}
-    .item{cursor:pointer;padding:10px;border:1px solid #ccc;margin:5px;display:inline-block}
-    .gallery img{max-width:200px;margin:5px}
-    .back{margin:10px 0;display:inline-block;cursor:pointer;color:blue}
-    .label{font-weight:700;margin-right:8px}
-    .count{color:#666;margin-left:6px;font-size:90%}
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    h1 { margin-bottom: 2rem; }
+    .section { margin-bottom: 2rem; }
+    .label { font-weight: 600; display: block; margin-bottom: 0.5rem; font-size: 0.9rem; text-transform: uppercase; color: #666; }
+    .items { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .item { background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; cursor: pointer; font-size: 0.95rem; transition: background 0.2s; }
+    .item:hover { background: #e8e8e8; }
+    .count { font-size: 0.8rem; color: #999; margin-left: 0.5rem; }
+    #gallery { display: none; }
+    .gallery-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    .back { cursor: pointer; color: #0066cc; font-size: 1.1rem; }
+    .back:hover { text-decoration: underline; }
+    .gallery-images { display: flex; flex-wrap: wrap; gap: 1rem; }
+    .gallery-images img { max-width: 200px; height: auto; border-radius: 4px; }
   </style>
 </head>
 <body>
   <h1>{{ site.full_name }}</h1>
 
   <div class="section">
-    <span class="label">Albums:</span>
-    <div id="albums" style="display:inline-block"></div>
+    <span class="label">Albums</span>
+    <div class="items" id="albums"></div>
   </div>
 
   <div class="section">
-    <span class="label">Categories:</span>
-    <div id="categories" style="display:inline-block"></div>
+    <span class="label">Categories</span>
+    <div class="items" id="categories"></div>
   </div>
 
-  <div id="gallery" style="display:none"></div>
+  <div id="gallery">
+    <div class="gallery-header">
+      <span class="back" onclick="closeGallery()">← Back</span>
+      <h2 id="gallery-title" style="margin: 0;"></h2>
+    </div>
+    <div class="gallery-images" id="gallery-images"></div>
+  </div>
 
   <script>
-    // Build an array of image file paths at build time using Jekyll's site.static_files
     var files = [
       {% for file in site.static_files %}
         {% assign p = file.path %}
@@ -41,14 +53,12 @@
       {% endfor %}
     ];
 
-    // Maps and sets for albums and categories
-    var albumsMap = {}; // albumName => [paths]
-    var categoriesMap = {}; // categoryKey => { display: originalFirstWord, items: [paths] }
+    var albumsMap = {};
+    var categoriesMap = {};
 
     files.forEach(function(path){
-      // Normalize and split: expect paths like /images/<album>/<file>
       var parts = path.replace(/^\/+,'').split('/');
-      if(parts.length < 3) return; // need images/<album>/<file>
+      if(parts.length < 3) return;
 
       var album = parts[1];
       albumsMap[album] = albumsMap[album] || [];
@@ -56,7 +66,6 @@
 
       var filename = parts[parts.length - 1];
       var base = filename.replace(/\.[^/.]+$/, '');
-      // Get the first word: split on non-alphanumeric characters
       var first = base.split(/[^A-Za-z0-9]+/)[0] || base;
       var key = first.toLowerCase();
       var display = first.charAt(0).toUpperCase() + first.slice(1);
@@ -64,64 +73,54 @@
       categoriesMap[key].items.push(path);
     });
 
-    var albumsEl = document.getElementById('albums');
-    var categoriesEl = document.getElementById('categories');
-    var galleryEl = document.getElementById('gallery');
+    function render(){
+      var albumsEl = document.getElementById('albums');
+      var categoriesEl = document.getElementById('categories');
 
-    function renderAlbums(){
       albumsEl.innerHTML = '';
       Object.keys(albumsMap).sort().forEach(function(album){
-        var el = document.createElement('div');
-        el.className = 'item';
-        el.textContent = album + ' ';
-        var count = document.createElement('span');
-        count.className = 'count';
-        count.textContent = '(' + albumsMap[album].length + ')';
-        el.appendChild(count);
-        el.onclick = function(){ openGallery(album, albumsMap[album], 'Album: ' + album); };
-        albumsEl.appendChild(el);
+        var item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = album + '<span class="count">(' + albumsMap[album].length + ')</span>';
+        item.onclick = function(){ showGallery(album, albumsMap[album], 'Album: ' + album); };
+        albumsEl.appendChild(item);
       });
-    }
 
-    function renderCategories(){
       categoriesEl.innerHTML = '';
       Object.keys(categoriesMap).sort().forEach(function(key){
         var c = categoriesMap[key];
-        var el = document.createElement('div');
-        el.className = 'item';
-        el.textContent = c.display + ' ';
-        var count = document.createElement('span');
-        count.className = 'count';
-        count.textContent = '(' + c.items.length + ')';
-        el.appendChild(count);
-        el.onclick = function(){ openGallery(c.display, c.items, 'Category: ' + c.display); };
-        categoriesEl.appendChild(el);
+        var item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = c.display + '<span class="count">(' + c.items.length + ')</span>';
+        item.onclick = function(){ showGallery(c.display, c.items, 'Category: ' + c.display); };
+        categoriesEl.appendChild(item);
       });
     }
 
-    function openGallery(name, items, title){
-      albumsEl.style.display = 'none';
-      categoriesEl.style.display = 'none';
-      galleryEl.style.display = 'block';
-      galleryEl.innerHTML = '<div class="back" onclick="closeGallery()">← Back</div><h2>' + (title || name) + '</h2>';
+    function showGallery(name, items, title){
+      document.getElementById('albums').parentElement.style.display = 'none';
+      document.getElementById('categories').parentElement.style.display = 'none';
+      document.getElementById('gallery').style.display = 'block';
+      document.getElementById('gallery-title').textContent = title;
+      
+      var container = document.getElementById('gallery-images');
+      container.innerHTML = '';
       items.forEach(function(src){
         var img = document.createElement('img');
         img.src = src;
         img.alt = name;
-        galleryEl.appendChild(img);
+        container.appendChild(img);
       });
-      window.scrollTo(0,0);
+      window.scrollTo(0, 0);
     }
 
     function closeGallery(){
-      galleryEl.style.display = 'none';
-      albumsEl.style.display = 'inline-block';
-      categoriesEl.style.display = 'inline-block';
-      galleryEl.innerHTML = '';
+      document.getElementById('albums').parentElement.style.display = 'block';
+      document.getElementById('categories').parentElement.style.display = 'block';
+      document.getElementById('gallery').style.display = 'none';
     }
 
-    renderAlbums();
-    renderCategories();
+    render();
   </script>
 </body>
 </html>
