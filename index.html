@@ -120,8 +120,44 @@
       galleryEl.innerHTML = '';
     }
 
+    function showRandomPhotoFromAlbum(albumName) {
+      if (!albumsMap[albumName] || albumsMap[albumName].length === 0) {
+        alert('Album not found or empty.');
+        return;
+      }
+      var randomIndex = Math.floor(Math.random() * albumsMap[albumName].length);
+      var photoPath = albumsMap[albumName][randomIndex];
+      var img = document.createElement('img');
+      img.src = photoPath;
+      img.alt = albumName;
+      img.style.maxWidth = '100%';
+      img.style.margin = '20px 0';
+
+      var container = document.createElement('div');
+      container.style.textAlign = 'center';
+      container.appendChild(img);
+
+      var backButton = document.createElement('div');
+      backButton.textContent = '← Back';
+      backButton.style.cursor = 'pointer';
+      backButton.style.color = 'blue';
+      backButton.style.marginTop = '10px';
+      backButton.onclick = function () {
+        document.body.removeChild(container);
+      };
+      container.appendChild(backButton);
+
+      document.body.appendChild(container);
+    }
+
     renderAlbums();
     renderCategories();
   </script>
+
+  
+
+  <footer style="margin-top:20px;text-align:center;color:#666;font-size:90%;">
+    Thank you for visiting Memories in Pixel. We hope you enjoy exploring this gallery!
+  </footer>
 </body>
 </html>
