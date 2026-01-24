@@ -118,6 +118,10 @@
       albumsEl.style.display = 'inline-block';
       categoriesEl.style.display = 'inline-block';
       galleryEl.innerHTML = '';
+      var randomPhotoContainer = document.querySelector('body > div[style*="text-align: center"]');
+      if (randomPhotoContainer) {
+        document.body.removeChild(randomPhotoContainer);
+      }
     }
 
     function showRandomPhotoFromAlbum(albumName) {
