@@ -173,17 +173,18 @@ body.modal-open {
 }
 
 .photo-modal__content {
+  display: none;
+}
+
+.photo-modal__viewer {
   position: relative;
   z-index: 1;
-  width: min(1220px, 94vw);
-  height: min(88vh, 860px);
-  margin: 5vh auto;
-  background: #131922;
-  border: 1px solid #2e3a4d;
-  border-radius: 14px;
+  width: min(1320px, 96vw);
+  height: min(92vh, 980px);
+  margin: 4vh auto;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 1fr minmax(230px, 280px);
+  grid-template-rows: 1fr auto;
 }
 
 .photo-modal__close {
@@ -199,13 +200,14 @@ body.modal-open {
   font-size: 22px;
   line-height: 1;
   cursor: pointer;
+  z-index: 3;
 }
 
 .photo-modal__image-wrap {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  background: #0a0d11;
+  background: transparent;
   padding: 22px;
   overflow: auto;
 }
@@ -220,30 +222,31 @@ body.modal-open {
   display: block;
 }
 
-.photo-modal__meta {
-  border-left: 1px solid #2e3a4d;
-  padding: 20px 16px;
-  overflow-y: auto;
-}
-
-.photo-modal__title {
-  margin: 0 0 14px;
-  font-size: 16px;
-  word-break: break-word;
-}
-
 .photo-modal__toggle {
-  margin: 0 0 14px;
+  position: absolute;
+  top: 10px;
+  right: 54px;
   border: 1px solid #425572;
   background: #1d2736;
   color: #e7edf8;
   border-radius: 8px;
   padding: 8px 10px;
   cursor: pointer;
+  z-index: 3;
 }
 
 .photo-modal__toggle:hover {
   border-color: #6984a9;
+}
+
+.photo-modal__info {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 10px 22px 14px;
+  color: #d7deea;
+  font-size: 13px;
+  background: rgba(8, 11, 16, 0.84);
 }
 
 .photo-properties {
@@ -274,20 +277,26 @@ body.modal-open {
 
 .photo-modal--fit .photo-modal__image {
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(92vh - 110px);
   width: auto;
   height: auto;
   object-fit: contain;
 }
 
 @media (max-width: 900px) {
-  .photo-modal__content {
-    grid-template-columns: 1fr;
-    height: min(92vh, 980px);
+  .photo-modal__viewer {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    grid-template-rows: 1fr auto;
   }
 
-  .photo-modal__meta {
-    border-left: none;
-    border-top: 1px solid #2e3a4d;
+  .photo-modal__image-wrap {
+    padding: 16px;
+  }
+
+  .photo-modal__info {
+    gap: 12px;
+    padding: 10px 16px 12px;
   }
 }
