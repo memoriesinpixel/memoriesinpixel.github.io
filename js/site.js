@@ -267,7 +267,7 @@ function setModalFitMode(modal, isFit) {
 function openPhotoModal(modal, photo, albumName) {
   if (!modal.root || !modal.image) return;
 
-  setModalFitMode(modal, false);
+  setModalFitMode(modal, true);
   modal.metaResolution.textContent = 'Loading...';
   modal.metaFocal.textContent = '—';
   modal.metaAperture.textContent = '—';
