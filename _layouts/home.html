@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site.title }}</title>
+  {% include favicon.html %}
+  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
+</head>
+<body class="site-page site-home">
+  <main class="container">
+    <header class="hero">
+      <p class="eyebrow">Photography Portfolio</p>
+      <h1>{{ site.full_name }}</h1>
+      <p class="subtitle">A curated collection of travel and place photography.</p>
+    </header>
+
+    <section>
+      <h2 class="section-title">Albums</h2>
+      <div id="albums-grid" class="albums-grid"></div>
+    </section>
+  </main>
+
+  <script>
+    window.galleryFiles = [
+      {% for file in site.static_files %}
+        {% assign p = file.path %}
+        {% if p contains 'images/' and (p contains '.jpg' or p contains '.jpeg' or p contains '.png' or p contains '.gif' or p contains '.webp') %}
+          {{ file.path | relative_url | jsonify }},
+        {% endif %}
+      {% endfor %}
+    ];
+
+    window.albumMeta = {
+      {% for p in site.pages %}
+        {% if p.layout == 'album' and p.album_dir %}
+          {{ p.album_dir | jsonify }}: {
+            url: {{ p.url | relative_url | jsonify }},
+            name: {{ p.album_name | default: p.album_dir | jsonify }}
+          },
+        {% endif %}
+      {% endfor %}
+    };
+  </script>
+  <script src="{{ '/js/site.js' | relative_url }}"></script>
+</body>
+</html>

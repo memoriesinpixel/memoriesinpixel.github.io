@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.album_name }} · {{ site.title }}</title>
+  {% include favicon.html %}
+  <link rel="stylesheet" href="{{ '/css/style.css' | relative_url }}">
+</head>
+<body class="site-page site-album">
+  <main class="container">
+    <a class="back-link" href="{{ '/' | relative_url }}">← Back to albums</a>
+
+    <header class="hero hero--album">
+      <p class="eyebrow">Album</p>
+      <h1>{{ page.album_name }}</h1>
+      <p class="subtitle">Browse by category within this album.</p>
+    </header>
+
+    <section>
+      <h2 class="section-title">Categories</h2>
+      <div id="category-nav" class="category-nav"></div>
+    </section>
+
+    <div id="album-gallery" class="album-gallery"></div>
+  </main>
+
+  {% assign album_prefix = 'images/' | append: page.album_dir | append: '/' %}
+  <script>
+    window.albumName = {{ page.album_name | jsonify }};
+    window.albumFiles = [
+      {% for file in site.static_files %}
+        {% assign p = file.path %}
+        {% if p contains album_prefix and (p contains '.jpg' or p contains '.jpeg' or p contains '.png' or p contains '.gif' or p contains '.webp') %}
+          {{ file.path | relative_url | jsonify }},
+        {% endif %}
+      {% endfor %}
+    ];
+  </script>
+  <script src="{{ '/js/site.js' | relative_url }}"></script>
+</body>
+</html>
