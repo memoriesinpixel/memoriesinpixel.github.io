@@ -25,7 +25,8 @@
     window.galleryFiles = [
       {% for file in site.static_files %}
         {% assign p = file.path %}
-        {% if p contains 'images/' and (p contains '.jpg' or p contains '.jpeg' or p contains '.png' or p contains '.gif' or p contains '.webp') %}
+        {% assign p_down = p | downcase %}
+        {% if p_down contains 'images/' and (p_down contains '.jpg' or p_down contains '.jpeg' or p_down contains '.png' or p_down contains '.gif' or p_down contains '.webp') %}
           {{ file.path | relative_url | jsonify }},
         {% endif %}
       {% endfor %}

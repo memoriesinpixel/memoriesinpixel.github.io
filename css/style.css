@@ -105,6 +105,12 @@ h1 {
   padding: 6px 12px;
   font-size: 13px;
   color: #d2d9e5;
+  cursor: pointer;
+}
+
+.category-pill.is-active {
+  background: #2c3b56;
+  border-color: #6079a0;
 }
 
 .album-gallery {
@@ -128,20 +134,129 @@ h1 {
 
 .photo-thumb {
   width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius: 10px;
   border: 1px solid #2a3240;
   cursor: zoom-in;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.photo-thumb.is-zoomed {
-  transform: scale(1.75);
-  z-index: 4;
-  position: relative;
-  cursor: zoom-out;
+.photo-thumb:hover {
+  transform: translateY(-1px);
+  border-color: #50617a;
 }
 
 .empty-state {
   margin: 0;
   color: #b5bdca;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.photo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.photo-modal[hidden] {
+  display: none;
+}
+
+.photo-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.photo-modal__content {
+  position: relative;
+  z-index: 1;
+  width: min(1220px, 94vw);
+  height: min(88vh, 860px);
+  margin: 5vh auto;
+  background: #131922;
+  border: 1px solid #2e3a4d;
+  border-radius: 14px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr minmax(230px, 280px);
+}
+
+.photo-modal__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #41526e;
+  background: #1a2230;
+  color: #e9edf5;
+  border-radius: 999px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.photo-modal__image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0d11;
+  padding: 22px;
+}
+
+.photo-modal__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.photo-modal__meta {
+  border-left: 1px solid #2e3a4d;
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+
+.photo-modal__title {
+  margin: 0 0 14px;
+  font-size: 16px;
+  word-break: break-word;
+}
+
+.photo-properties {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.photo-properties dt {
+  margin: 10px 0 0;
+  color: #95a5be;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+}
+
+.photo-properties dd {
+  margin: 0;
+  color: #e4e8ef;
+  word-break: break-word;
+}
+
+@media (max-width: 900px) {
+  .photo-modal__content {
+    grid-template-columns: 1fr;
+    height: min(92vh, 980px);
+  }
+
+  .photo-modal__meta {
+    border-left: none;
+    border-top: 1px solid #2e3a4d;
+  }
 }

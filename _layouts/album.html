@@ -31,12 +31,34 @@
     window.albumFiles = [
       {% for file in site.static_files %}
         {% assign p = file.path %}
-        {% if p contains album_prefix and (p contains '.jpg' or p contains '.jpeg' or p contains '.png' or p contains '.gif' or p contains '.webp') %}
+        {% assign p_down = p | downcase %}
+        {% assign album_prefix_down = album_prefix | downcase %}
+        {% if p_down contains album_prefix_down and (p_down contains '.jpg' or p_down contains '.jpeg' or p_down contains '.png' or p_down contains '.gif' or p_down contains '.webp') %}
           {{ file.path | relative_url | jsonify }},
         {% endif %}
       {% endfor %}
     ];
   </script>
+
+  <aside id="photo-modal" class="photo-modal" hidden>
+    <div class="photo-modal__backdrop" data-close-modal></div>
+    <div class="photo-modal__content">
+      <button id="photo-modal-close" class="photo-modal__close" type="button" aria-label="Close photo viewer">×</button>
+      <div class="photo-modal__image-wrap">
+        <img id="photo-modal-image" class="photo-modal__image" alt="Selected photo">
+      </div>
+      <section class="photo-modal__meta">
+        <h3 id="photo-modal-title" class="photo-modal__title"></h3>
+        <dl class="photo-properties">
+          <dt>Album</dt><dd id="meta-album"></dd>
+          <dt>Category</dt><dd id="meta-category"></dd>
+          <dt>Filename</dt><dd id="meta-filename"></dd>
+          <dt>Format</dt><dd id="meta-format"></dd>
+          <dt>Resolution</dt><dd id="meta-resolution">Loading...</dd>
+        </dl>
+      </section>
+    </div>
+  </aside>
   <script src="{{ '/js/site.js' | relative_url }}"></script>
 </body>
 </html>
