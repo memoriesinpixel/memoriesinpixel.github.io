@@ -109,7 +109,9 @@ function createPhotoModal() {
   return {
     root: document.getElementById('photo-modal'),
     image: document.getElementById('photo-modal-image'),
+    imageWrap: document.querySelector('.photo-modal__image-wrap'),
     closeButton: document.getElementById('photo-modal-close'),
+    toggleButton: document.getElementById('photo-modal-toggle'),
     title: document.getElementById('photo-modal-title'),
     metaAlbum: document.getElementById('meta-album'),
     metaCategory: document.getElementById('meta-category'),
@@ -119,8 +121,22 @@ function createPhotoModal() {
   };
 }
 
+function setModalFitMode(modal, isFit) {
+  if (!modal.root || !modal.toggleButton) return;
+
+  if (isFit) {
+    modal.root.classList.add('photo-modal--fit');
+    modal.toggleButton.textContent = 'Original size';
+  } else {
+    modal.root.classList.remove('photo-modal--fit');
+    modal.toggleButton.textContent = 'Fit to screen';
+  }
+}
+
 function openPhotoModal(modal, photo, albumName) {
   if (!modal.root || !modal.image) return;
+
+  setModalFitMode(modal, false);
 
   modal.title.textContent = photo.filename;
   modal.metaAlbum.textContent = albumName;
@@ -133,6 +149,11 @@ function openPhotoModal(modal, photo, albumName) {
     modal.metaResolution.textContent = modal.image.naturalWidth + ' × ' + modal.image.naturalHeight;
   };
   modal.image.src = photo.src;
+
+  if (modal.imageWrap) {
+    modal.imageWrap.scrollTop = 0;
+    modal.imageWrap.scrollLeft = 0;
+  }
 
   modal.root.hidden = false;
   document.body.classList.add('modal-open');
@@ -234,6 +255,13 @@ function initAlbumPage() {
   if (modal.closeButton) {
     modal.closeButton.onclick = function() {
       closePhotoModal(modal);
+    };
+  }
+
+  if (modal.toggleButton) {
+    modal.toggleButton.onclick = function() {
+      var isFit = modal.root.classList.contains('photo-modal--fit');
+      setModalFitMode(modal, !isFit);
     };
   }
 
